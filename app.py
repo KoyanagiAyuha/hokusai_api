@@ -303,10 +303,11 @@ if __name__ == "__main__":
             while True:
                 height, width, channels = inputimg.shape[:3]
                 gaso = height * width * channels
-                if 1100 * 1100 * 3 < gaso:
-                    logging.critical('tosmall')
+                if 1200 * 1200 * 3 < gaso:
+
                     inputimg = cv2.resize(inputimg, (int(width*0.95), int(height*0.95)))
                 else:
+                    cv2.imwrite(tmpinput, inputimg)
                     break
 
             main(tmpinput, tmpoutput, style_num)
