@@ -281,7 +281,7 @@ if __name__ == "__main__":
                 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html#SQS.Message.body
 
             except Exception as e:
-                pass
+                continue
 
             logging.critical('got message')
             bucket_name = json_body['bucket']
