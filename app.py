@@ -17,6 +17,7 @@ import tempfile
 import base64
 import cv2
 import logging
+import boto3
 
 BATCH_SIZE = 4
 DEVICE = '/gpu:0'
