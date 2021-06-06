@@ -254,17 +254,19 @@ def imgEncodeDecode(in_imgs, ch, quality=5):
     return out_imgs
 
 if __name__ == "__main__":
+    sqs = boto3.resource('sqs', region_name="ap-northeast-1")
+    QUEUE_NAME = 'hokusai.fifo'
+    queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
+    s3 = boto3.resource('s3', region_name="ap-northeast-1")
+    bucket = s3.Bucket(bucket_name)
     while True:
         try:
-            sqs = boto3.resource('sqs', region_name="ap-northeast-1")
-            QUEUE_NAME = 'hokusai.fifo'
-            queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
+
             try:
                 res_messages = queue.receive_messages(
                     WaitTimeSeconds=0,
                     MaxNumberOfMessages=1   # 小柳様のPyでは1を指定頂く想定です。1動画のみ処理する。
                 )
-                logging.critical(res_messages[0])
 
                 #print(json.load(response).body)
                 # 戻りはlist(sqs.Message)型
@@ -283,7 +285,7 @@ if __name__ == "__main__":
             except Exception as e:
                 continue
 
-            logging.critical('got message')
+            print('got message')
             bucket_name = json_body['bucket']
             key = json_body['key']
             style_num = json_body['style_num']
@@ -293,8 +295,7 @@ if __name__ == "__main__":
             tmpoutput = tmp + 'output.jpg'
             # tmpinput = '/tmp/image.jpg'
             # tmpoutput = '/tmp/image.jpg'
-            s3 = boto3.resource('s3', region_name="ap-northeast-1")
-            bucket = s3.Bucket(bucket_name)
+
             bucket.download_file(key, tmpinput)
 
             main(tmpinput, tmpoutput, style_num)
@@ -315,6 +316,19 @@ if __name__ == "__main__":
             )
             logging.critical('fin')
             tmpdir.cleanup()
+            del bucket_name
+            del key
+            del style_num
+            del tmpdir
+            del tmp
+            del tmpinput
+            del tmpoutput
+            del res_messages
+            del cvimg
+            del output_base64_image
+            del result_json
+            del result_json_dumps
+            del resultkey
 
         except Exception as e:
             logging.error(e)
@@ -331,3 +345,16 @@ if __name__ == "__main__":
             )
             logging.critical('fin error')
             tmpdir.cleanup()
+            del bucket_name
+            del key
+            del style_num
+            del tmpdir
+            del tmp
+            del tmpinput
+            del tmpoutput
+            del res_messages
+            del cvimg
+            del output_base64_image
+            del result_json
+            del result_json_dumps
+            del resultkey
