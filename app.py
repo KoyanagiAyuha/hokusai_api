@@ -16,6 +16,7 @@ import moviepy.video.io.ffmpeg_writer as ffmpeg_writer
 import tempfile
 import base64
 import cv2
+import logging
 
 BATCH_SIZE = 4
 DEVICE = '/gpu:0'
@@ -250,24 +251,80 @@ def imgEncodeDecode(in_imgs, ch, quality=5):
 
     return out_imgs
 
-def handler(event, context):
-    base_64ed_image = event['img']
-    style_num = event['style_num']
-    # tmpdir = tempfile.TemporaryDirectory()
-    # tmp = tmpdir.name + '/'
-    # tmpinput = tmp + 'input.jpg'
-    # tmpoutput = tmp + 'output.jpg'
-    tmpinput = '/tmp/image.jpg'
-    tmpoutput = '/tmp/image.jpg'
-    cvimg = base64_to_cv2(base_64ed_image)
-    # while True:
-    #     if  sys.getsizeof(cvimg) < 2000000:
-    #         break
-    #     cvimg = imgEncodeDecode([cvimg], ch, 95)
-    cv2.imwrite(tmpinput, cvimg)
+if __name__ == "__main__":
+    while True:
+        try:
+            sqs = boto3.resource('sqs')
+            QUEUE_NAME = 'hokusai.fifo'
+            queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
+            try:
+                res_messages = queue.receive_messages(
+                    WaitTimeSeconds=0,
+                    MaxNumberOfMessages=1   # 小柳様のPyでは1を指定頂く想定です。1動画のみ処理する。
+                )
 
-    main(tmpinput, tmpoutput, style_num)
-    cvimg = cv2.imread(tmpoutput)
-    output_base64_image = cv2_to_base64(cvimg)
-    # tmpdir.cleanup()
-    return output_base64_image
+
+                #print(json.load(response).body)
+                # 戻りはlist(sqs.Message)型
+                json_body = json.loads(res_messages[0].body)
+                for res_message in res_messages:
+                    json_body = json.loads(res_message.body)
+                    print(res_message.body)
+                    que_object_url = json_body['objectUrl']
+                    print('objectUrl:{0}'.format(que_object_url))
+                    res_message.delete()
+
+                #print(json.loads(res_messages[0]).head)
+                #res_messages[0].delete()
+                break
+                # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html#SQS.Message.body
+
+            except Exception as e:
+                pass
+
+            logging.critical('got message')
+            bucket_name = json_body['bucket']
+            key = json_body['key']
+            style_num = json_body['style_num']
+            tmpdir = tempfile.TemporaryDirectory()
+            tmp = tmpdir.name + '/'
+            tmpinput = tmp + 'input.jpg'
+            tmpoutput = tmp + 'output.jpg'
+            # tmpinput = '/tmp/image.jpg'
+            # tmpoutput = '/tmp/image.jpg'
+            bucket = s3.Bucket(bucket_name)
+            bucket.download_file(key, tmpinput)
+
+            main(tmpinput, tmpoutput, style_num)
+            cvimg = cv2.imread(tmpoutput)
+            output_base64_image = cv2_to_base64(cvimg)
+
+            result_json = {
+                "status":"OK",
+                "status_message":"",
+                "result_img":output_base64_image
+            }
+
+            result_json_dumps = json.dumps(result_json)
+            resultkey = 'json/' + key.split('.')[0].split('/')[-1] + '.json'
+            bucket.put_object(
+                Body = result_json_dumps,
+                Key = resultkey
+            )
+            logging.critical('fin')
+            tmpdir.cleanup()
+
+        except Exception as e:
+            result_json = {
+                "status":"NG",
+                "status_message":"Raise error during conversion"
+            }
+
+            result_json_dumps = json.dumps(result_json)
+            resultkey = 'json/' + key.split('.')[0].split('/')[-1] + '.json'
+            bucket.put_object(
+                Body = result_json_dumps,
+                Key = resultkey
+            )
+            logging.critical('fin error')
+            tmpdir.cleanup()
