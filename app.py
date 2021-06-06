@@ -263,7 +263,7 @@ if __name__ == "__main__":
                     WaitTimeSeconds=0,
                     MaxNumberOfMessages=1   # 小柳様のPyでは1を指定頂く想定です。1動画のみ処理する。
                 )
-                logging.critical(len(res_messages))
+                logging.critical(res_messages[0])
 
                 #print(json.load(response).body)
                 # 戻りはlist(sqs.Message)型
