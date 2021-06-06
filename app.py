@@ -258,7 +258,7 @@ if __name__ == "__main__":
     QUEUE_NAME = 'hokusai.fifo'
     queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
     s3 = boto3.resource('s3', region_name="ap-northeast-1")
-    bucket = s3.Bucket(bucket_name)
+    
     while True:
         try:
 
@@ -287,6 +287,7 @@ if __name__ == "__main__":
 
             print('got message')
             bucket_name = json_body['bucket']
+            bucket = s3.Bucket(bucket_name)
             key = json_body['key']
             style_num = json_body['style_num']
             tmpdir = tempfile.TemporaryDirectory()
