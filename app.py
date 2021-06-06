@@ -255,7 +255,7 @@ def imgEncodeDecode(in_imgs, ch, quality=5):
 if __name__ == "__main__":
     while True:
         try:
-            sqs = boto3.resource('sqs')
+            sqs = boto3.resource('sqs', region_name="ap-northeast-1")
             QUEUE_NAME = 'hokusai.fifo'
             queue = sqs.get_queue_by_name(QueueName=QUEUE_NAME)
             try:
@@ -293,6 +293,7 @@ if __name__ == "__main__":
             tmpoutput = tmp + 'output.jpg'
             # tmpinput = '/tmp/image.jpg'
             # tmpoutput = '/tmp/image.jpg'
+            s3 = boto3.resource('s3', region_name="ap-northeast-1")
             bucket = s3.Bucket(bucket_name)
             bucket.download_file(key, tmpinput)
 
