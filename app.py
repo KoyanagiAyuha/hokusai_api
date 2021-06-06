@@ -285,7 +285,7 @@ if __name__ == "__main__":
             except Exception as e:
                 continue
 
-            print('got message')
+            logging.critical('got message')
             bucket_name = json_body['bucket']
             bucket = s3.Bucket(bucket_name)
             key = json_body['key']
@@ -340,5 +340,5 @@ if __name__ == "__main__":
                 Body = result_json_dumps,
                 Key = resultkey
             )
-            logging.critical('fin error')
+            logging.error('fin error')
             tmpdir.cleanup()
