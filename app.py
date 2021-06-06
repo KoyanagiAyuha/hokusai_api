@@ -277,7 +277,6 @@ if __name__ == "__main__":
 
                 #print(json.loads(res_messages[0]).head)
                 res_messages[0].delete()
-                break
                 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html#SQS.Message.body
 
             except Exception as e:
