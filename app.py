@@ -267,15 +267,15 @@ if __name__ == "__main__":
                 #print(json.load(response).body)
                 # 戻りはlist(sqs.Message)型
                 json_body = json.loads(res_messages[0].body)
-                for res_message in res_messages:
-                    json_body = json.loads(res_message.body)
-                    print(res_message.body)
-                    que_object_url = json_body['objectUrl']
-                    print('objectUrl:{0}'.format(que_object_url))
-                    res_message.delete()
+                # for res_message in res_messages:
+                #     json_body = json.loads(res_message.body)
+                #     print(res_message.body)
+                #     que_object_url = json_body['objectUrl']
+                #     print('objectUrl:{0}'.format(que_object_url))
+                #     res_message.delete()
 
                 #print(json.loads(res_messages[0]).head)
-                #res_messages[0].delete()
+                res_messages[0].delete()
                 break
                 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/sqs.html#SQS.Message.body
 
