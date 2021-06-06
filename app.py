@@ -18,6 +18,7 @@ import base64
 import cv2
 import logging
 import boto3
+import os
 
 BATCH_SIZE = 4
 DEVICE = '/gpu:0'
