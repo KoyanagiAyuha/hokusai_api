@@ -298,6 +298,15 @@ if __name__ == "__main__":
             # tmpoutput = '/tmp/image.jpg'
 
             bucket.download_file(key, tmpinput)
+            inputimg = cv2.imread(tmpinput)
+            
+            while True:
+                height, width, channels = inputimg.shape[:3]
+                gaso = height * width * channels
+                if 1200 * 1200 * 3 < gaso:
+                    inputimg = cv2.resize(img, (int(width*0.95), int(height*0.95)))
+                else:
+                    break
 
             main(tmpinput, tmpoutput, style_num)
             cvimg = cv2.imread(tmpoutput)
