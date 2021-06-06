@@ -315,6 +315,7 @@ if __name__ == "__main__":
             tmpdir.cleanup()
 
         except Exception as e:
+            logging.error(e)
             result_json = {
                 "status":"NG",
                 "status_message":"Raise error during conversion"
