@@ -304,7 +304,7 @@ if __name__ == "__main__":
                 height, width, channels = inputimg.shape[:3]
                 gaso = height * width * channels
                 if 1200 * 1200 * 3 < gaso:
-                    inputimg = cv2.resize(img, (int(width*0.95), int(height*0.95)))
+                    inputimg = cv2.resize(inputimg, (int(width*0.95), int(height*0.95)))
                 else:
                     break
 
@@ -326,19 +326,6 @@ if __name__ == "__main__":
             )
             logging.critical('fin')
             tmpdir.cleanup()
-            del bucket_name
-            del key
-            del style_num
-            del tmpdir
-            del tmp
-            del tmpinput
-            del tmpoutput
-            del res_messages
-            del cvimg
-            del output_base64_image
-            del result_json
-            del result_json_dumps
-            del resultkey
 
         except Exception as e:
             logging.error(e)
@@ -355,16 +342,3 @@ if __name__ == "__main__":
             )
             logging.critical('fin error')
             tmpdir.cleanup()
-            del bucket_name
-            del key
-            del style_num
-            del tmpdir
-            del tmp
-            del tmpinput
-            del tmpoutput
-            del res_messages
-            del cvimg
-            del output_base64_image
-            del result_json
-            del result_json_dumps
-            del resultkey
